@@ -1,0 +1,21 @@
+import hudson.scm.*
+ 
+jenkinsInstance = jenkins.model.Jenkins.instanc
+allJobs = jenkinsInstance.items
+ 
+svnCredentialsId = "c8xxxee-965c-4cc0-b662-8a5xxx7d41b"
+ 
+
+allJobs.each { job ->
+    if (job.scm instanceof SubversionSCM) {
+        if (job.scm.locations[0].remote.startsWith("http://oldhost/svn")) {
+            oldUrl = job.scm.locations[0].remote
+            newUrl = oldUrl.replace("http://oldhost/svn", "https://newhost/svn/project")
+ 
+            println("changing Subversion URL in " + job.name + " from " + oldUrl + " to " + newUrl)
+ 
+            job.scm = new hudson.scm.SubversionSCM(newUrl)
+            job.scm.locations[0] = job.scm.locations[0].withCredentialsId(svnCredentialsId)
+        }
+    }
+}
